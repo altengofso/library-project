@@ -13,9 +13,12 @@ from django.urls import reverse
 from django.views import generic
 from django.views.generic.edit import FormMixin
 from django.views.generic.list import MultipleObjectMixin
+from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 
 from .forms import BookCommentForm, BookForm
 from .models import Author, Book, BookComment
+from .serializers import BookSerializer
 
 
 class IndexView(generic.TemplateView):
@@ -165,3 +168,20 @@ class AuthorDetailView(generic.DetailView, MultipleObjectMixin):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         object_list = Book.objects.filter(author=self.object)
         return super().get_context_data(object_list=object_list, **kwargs)
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 6
+    page_size_query_param = "page_size"
+    max_page_size = 20
+
+
+class BooksListAPIView(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    pagination_class = StandardResultsSetPagination
+
+
+class BooksRetrieveAPIView(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer

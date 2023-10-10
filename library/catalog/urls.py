@@ -37,4 +37,6 @@ urlpatterns = [
         view=views.AuthorDetailView.as_view(),
         name="author-detail",
     ),
+    path("api/v1/books/", view=views.BooksListAPIView.as_view()),
+    path("api/v1/books/<pk>/", view=views.BooksRetrieveAPIView.as_view()),
 ]
