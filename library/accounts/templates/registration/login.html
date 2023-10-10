@@ -1,0 +1,41 @@
+{% extends "base_generic.html" %}
+{% load catalog_extras %}
+
+{% block title %}
+<title>Библиотека - Войдите</title>
+{% endblock %}
+
+{% block content %}
+<div class="py-4 text-center container">
+    <div class="row py-lg-4">
+        <div class="col-lg-4 col-md-6 mx-auto">
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <h1 class="h3 mb-3 fw-normal">Войдите</h1>
+
+                {% for field in form %}
+                <div class="form-floating mb-2">
+                    {{ field|placeholder:field.label|add_class:"form-control" }}
+                    <label for="{{field.id_for_label}}">{{ field.label }}</label>
+                </div>
+                {% if field.errors %}
+                {% for error in field.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                <button class="btn btn-primary w-100 py-2 mb-2" type="submit">Войти</button>
+            </form>
+            {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Имя пользователя или пароль неверны
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

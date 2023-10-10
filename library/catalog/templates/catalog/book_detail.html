@@ -1,0 +1,85 @@
+{% extends "base_generic.html" %}
+{% load catalog_extras %}
+
+{% block title %}
+<title>Библиотека - {{ book.title }} </title>
+{% endblock %}
+
+{% block content %}
+<div class="py-4 text-center container">
+    <div class="row py-lg-4">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">{{ book.title }} </h1>
+        </div>
+    </div>
+</div>
+<div class="py-lg-4 container">
+    <div class="container clearfix">
+        <img src="{{ book.poster.url }}" class="img-fluid col-md-4 float-md-start me-3 mb-3 ms-md-3"
+            alt="{{ book.title }}" />
+        <p>Автор: <a href="{{ book.author.get_absolute_url }}">{{ book.author.name }}</a></p>
+        <p>Год публикации: {{ book.publication_year }} </p>
+        <p>Описание: {{ book.summary }} </p>
+        {% if user == book.added_by %}
+        <a href="{% url 'book-update' book.id %}">
+            <button class="btn btn-primary py-2 mb-2" type="submit">Изменить</button>
+        </a>
+        <form method="post" action="{% url 'book-delete' book.id %}">
+            {% csrf_token %}
+            <button class="btn btn-primary py-2 mb-2" type="submit">Удалить</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="d-flex justify-content-center row">
+        <div class="col-md-8">
+            <div class="d-flex flex-column comment-section">
+                <div class="bg-white p-2">
+                    {%if user.is_authenticated %}
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <h1 class="h3 mb-3 fw-normal">Оставить комментарий</h1>
+                        {% for field in form %}
+                        <div class="form-floating mb-2">
+                            {{ field|placeholder:field.label|add_class:"form-control" }}
+                            <label for="{{field.id_for_label}}">{{ field.label }}</label>
+                        </div>
+                        {% if field.errors %}
+                        {% for error in field.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                        <button class="btn btn-primary py-2 mb-2" type="submit">Отправить</button>
+                    </form>
+
+                    {% endif %}
+                    {%for comment in object_list %}
+                    <div class="bg-white p-2">
+                        <div class="d-flex flex-row user-info">
+                            <div class="d-flex flex-column justify-content-start ml-2">
+                                <span class="d-block font-weight-bold name">{{ comment.user.username }}</span>
+                                <span class="date text-black-50">{{ comment.created_at }}</span>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="comment-text">{{ comment.content }}</p>
+                        </div>
+                        {% if user == comment.user %}
+                        <form method="post" action="{% url 'bookcomment-delete' book.id comment.id%}">
+                            {% csrf_token %}
+                            <button class="btn btn-primary py-2 mb-2" type="submit">Удалить</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock %}

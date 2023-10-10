@@ -1,0 +1,40 @@
+{% extends "base_generic.html" %}
+{% load catalog_extras %}
+
+{% block title %}
+<title>Библиотека - Книга</title>
+{% endblock %}
+
+{% block content %}
+<div class="py-4 text-center container">
+    <div class="row py-lg-4">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">Книга</h1>
+        </div>
+    </div>
+</div>
+<div class="py-lg-4 container">
+    <form method="post" action="">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-floating mb-2">
+            {% if field.name == "author"%}
+            {{ field|placeholder:field.label|add_class:"form-select" }}
+            {% else %}
+            {{ field|placeholder:field.label|add_class:"form-control" }}
+            {% endif %}
+            <label for="{{field.id_for_label}}">{{ field.label }}</label>
+        </div>
+        {% if field.errors %}
+        {% for error in field.errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+        <button class="btn btn-primary py-2 mb-2" type="submit">Подтвердить</button>
+    </form>
+</div>
+{% endblock %}

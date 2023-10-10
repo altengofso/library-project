@@ -1,0 +1,48 @@
+{% extends "base_generic.html" %}
+
+{% block title %}
+<title>Библиотека - {{ author.name }} </title>
+{% endblock %}
+
+{% block content %}
+<div class="py-4 text-center container">
+    <div class="row py-lg-4">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">{{ author.name }}</h1>
+        </div>
+    </div>
+</div>
+<div class="py-lg-4 container">
+    <div class="container clearfix">
+        <img src="{{ author.photo.url }}" class="img-fluid col-md-4 float-md-start me-3 mb-3 ms-md-3"
+            alt="{{ author.name }}" />
+        <p>Дата рождения: {{ author.date_of_birth }} </p>
+        <p>Биография: {{ author.bio }} </p>
+    </div>
+</div>
+<div class="py-4 text-center container">
+    <div class="row py-lg-4">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">Книги автора</h1>
+        </div>
+    </div>
+</div>
+<div class="py-lg-4 container">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {% for book in object_list %}
+        <div class="col">
+            <div class="card shadow-sm border-0 text-center">
+                <a class="my-2 mx-2" href="{{ book.get_absolute_url }}">
+                    <img class="bd-placeholder-img" height="225" src="{{ book.poster.url }}" alt=" {{ book.title }}">
+                </a>
+                <div class="card-body">
+                    <p class="card-text"> {{ book.title }} </p>
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
