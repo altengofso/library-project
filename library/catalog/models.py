@@ -1,5 +1,4 @@
 import uuid
-from collections.abc import Iterable
 from datetime import datetime
 
 from accounts.models import User
