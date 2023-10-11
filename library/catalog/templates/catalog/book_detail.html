@@ -20,14 +20,50 @@
         <p>Автор: <a href="{{ book.author.get_absolute_url }}">{{ book.author.name }}</a></p>
         <p>Год публикации: {{ book.publication_year }} </p>
         <p>Описание: {{ book.summary }} </p>
+        <p>
+            Рейтинг: {% if book.average_rating is not None %}{{ book.average_rating }}{% else %}Отсутствует{% endif %}
+        </p>
+        {%if user.is_authenticated %}
+        <div class="container">
+            <div class="d-flex justify-content-left row">
+                <div class="col-md-4 px-0">
+                    <div class="d-flex flex-column comment-section">
+                        <div class="bg-white">
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                {% for field in rating_form %}
+                                <div class="form-floating mb-2">
+                                    {{ field|placeholder:field.label|add_class:"form-select" }}
+                                    <label for="{{field.id_for_label}}">{{ field.label }}</label>
+                                </div>
+                                {% if field.errors %}
+                                {% for error in field.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                                {% endfor %}
+                                <button class="btn btn-primary py-2 mb-2" type="submit">Оценить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         {% if user == book.added_by %}
-        <a href="{% url 'book-update' book.id %}">
-            <button class="btn btn-primary py-2 mb-2" type="submit">Изменить</button>
-        </a>
-        <form method="post" action="{% url 'book-delete' book.id %}">
-            {% csrf_token %}
-            <button class="btn btn-primary py-2 mb-2" type="submit">Удалить</button>
-        </form>
+        <div class="btn-group" role="group">
+            <a href="{% url 'book-update' book.id %}">
+                <button class="btn btn-primary py-2 mb-2 me-2" type="submit">Изменить</button>
+            </a>
+            <form method="post" action="{% url 'book-delete' book.id %}">
+                {% csrf_token %}
+                <button class="btn btn-primary py-2 mb-2 me-2" type="submit">Удалить</button>
+            </form>
+        </div>
         {% endif %}
     </div>
 </div>
@@ -40,7 +76,7 @@
                     <form method="post" action="">
                         {% csrf_token %}
                         <h1 class="h3 mb-3 fw-normal">Оставить комментарий</h1>
-                        {% for field in form %}
+                        {% for field in comment_form %}
                         <div class="form-floating mb-2">
                             {{ field|placeholder:field.label|add_class:"form-control" }}
                             <label for="{{field.id_for_label}}">{{ field.label }}</label>
@@ -81,5 +117,6 @@
             </div>
         </div>
     </div>
+</div>
 
-    {% endblock %}
+{% endblock %}

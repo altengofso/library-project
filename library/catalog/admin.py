@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Author, Book, BookComment
+from .models import Author, Book, BookComment, BookRating
 
 
 @admin.register(Author)
@@ -44,3 +44,9 @@ class BookCommentAdmin(admin.ModelAdmin):
     ]
     fields = ["user", "book", "content", "created_at"]
     readonly_fields = ["created_at"]
+
+
+@admin.register(BookRating)
+class BookRatingAdmin(admin.ModelAdmin):
+    list_display = ["rate", "book", "user"]
+    fields = ["rate", "book", "user"]

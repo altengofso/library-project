@@ -2,6 +2,7 @@ from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
+from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import (
     HttpRequest,
@@ -11,41 +12,40 @@ from django.http import (
 )
 from django.urls import reverse
 from django.views import generic
-from django.views.generic.edit import FormMixin
 from django.views.generic.list import MultipleObjectMixin
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 
-from .forms import BookCommentForm, BookForm
+from .forms import BookCommentForm, BookForm, BookRatingForm
 from .models import Author, Book, BookComment
 from .serializers import BookSerializer
 
 
-class IndexView(generic.TemplateView):
+class IndexView(generic.ListView):
+    context_object_name = "books"
+    paginate_by = 6
     template_name = "index.html"
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["books"] = Book.objects.annotate(
-            num_comments=Count("comments")
-        ).order_by("-num_comments")[:6]
-        return context
+    def get_queryset(self) -> QuerySet[Any]:
+        return sorted(
+            Book.objects.exclude(rating__isnull=True).distinct(),
+            key=lambda book: book.average_rating,
+            reverse=True,
+        )
 
 
-class SearchView(generic.TemplateView, MultipleObjectMixin):
+class SearchView(generic.ListView):
     context_object_name = "books"
     paginate_by = 6
     template_name = "search.html"
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        object_list = []
+    def get_queryset(self) -> QuerySet[Any]:
         query = self.request.GET.get("q")
         if query:
-            object_list = Book.objects.filter(
+            return Book.objects.filter(
                 Q(title__icontains=query) | Q(author__name__icontains=query)
             )
-        context = super().get_context_data(object_list=object_list, **kwargs)
-        return context
+        return Book.objects.none()
 
 
 class BookListView(generic.ListView):
@@ -54,17 +54,24 @@ class BookListView(generic.ListView):
     paginate_by = 6
 
 
-class BookDetailView(generic.DetailView, FormMixin, MultipleObjectMixin):
+class BookDetailView(generic.DetailView, MultipleObjectMixin):
     model = Book
     paginate_by = 6
-    form_class = BookCommentForm
 
     def get_success_url(self) -> str:
         return reverse("book-detail", kwargs={"pk": self.object.pk})
 
+    def get(
+        self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        return self.render_to_response(context=self.get_context_data(**kwargs))
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        self.object = self.get_object()
         object_list = BookComment.objects.filter(book=self.object)
         context = super().get_context_data(object_list=object_list, **kwargs)
+        context["comment_form"] = BookCommentForm()
+        context["rating_form"] = BookRatingForm()
         return context
 
     def post(
@@ -73,16 +80,27 @@ class BookDetailView(generic.DetailView, FormMixin, MultipleObjectMixin):
         if not request.user.is_authenticated:
             return HttpResponseForbidden()
         self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
-
-    def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        form.instance.user = self.request.user
-        form.instance.book = self.object
-        form.save()
-        return super().form_valid(form)
+        comment_form = BookCommentForm(request.POST)
+        rating_form = BookRatingForm(request.POST)
+        if comment_form.is_valid():
+            comment_form.instance.user = self.request.user
+            comment_form.instance.book = self.object
+            comment_form.save()
+            return self.render_to_response(
+                context=self.get_context_data(**kwargs)
+            )
+        elif rating_form.is_valid():
+            rating_form.instance.user = self.request.user
+            rating_form.instance.book = self.object
+            rating_form.save()
+            return self.render_to_response(
+                context=self.get_context_data(**kwargs)
+            )
+        else:
+            context = self.get_context_data(**kwargs)
+            context["comment_form"] = comment_form
+            context["rating_form"] = rating_form
+            return self.render_to_response(context=context)
 
 
 class BookCreateView(LoginRequiredMixin, generic.CreateView):

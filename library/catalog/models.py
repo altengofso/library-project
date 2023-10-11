@@ -1,9 +1,10 @@
 import uuid
+from collections.abc import Iterable
 from datetime import datetime
 
 from accounts.models import User
 from django.contrib.postgres.indexes import GinIndex
-from django.db import models
+from django.db import IntegrityError, models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -162,6 +163,10 @@ class Book(models.Model):
 
     preview.short_description = "Предпросмотр"
 
+    @property
+    def average_rating(self):
+        return self.rating.all().aggregate(models.Avg("rate"))["rate__avg"]
+
 
 class BookComment(models.Model):
     id = models.UUIDField(
@@ -196,4 +201,57 @@ class BookComment(models.Model):
         verbose_name_plural = "Комментарии"
 
     def __str__(self) -> str:
-        return f"Комментарий {self.user.username} на книгу {self.book.title}"
+        return f"Комментарий пользователя {self.user.username} на книгу {self.book.title}"
+
+
+class BookRating(models.Model):
+    BAD = 1
+    POOR = 2
+    OK = 3
+    GOOD = 4
+    EXCELLENT = 5
+
+    RATING_CHOICES = ((BAD, 1), (POOR, 2), (OK, 3), (GOOD, 4), (EXCELLENT, 5))
+    rate = models.SmallIntegerField(
+        verbose_name="Оценка", choices=RATING_CHOICES, blank=False, null=False
+    )
+    book = models.ForeignKey(
+        Book,
+        verbose_name="Книга",
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name="rating",
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name="Пользователь",
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+    )
+
+    class Meta:
+        verbose_name = "Рейтинг"
+        verbose_name_plural = "Рейтинг"
+        unique_together = ["book", "user"]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(rate__gte=1, rate__lte=5),
+                name="book_rate_gte_1_lte_5",
+                violation_error_message="Рейтинг книги должен быть в интервале от 1 до 5",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"Оценка пользователя {self.user.username} на книгу {self.book.title}"
+
+    def save(self, *args, **kwargs) -> None:
+        try:
+            super().save(*args, **kwargs)
+        except IntegrityError:
+            existing_record = BookRating.objects.get(
+                models.Q(user=self.user) & models.Q(book=self.book)
+            )
+            existing_record.rate = self.rate
+            existing_record.save()

@@ -38,11 +38,13 @@
                             </li>
                         </ul>
                         <form class="d-flex me-2 mb-2" role="search" method="get" action="{% url 'search' %}">
-                            <input id="search" name="q" class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search">
+                            <input id="search" name="q" class="form-control me-2" type="search" autocomplete="off"
+                                placeholder="Поиск" aria-label="Search">
                             <button class="btn btn-outline-primary" type="submit">Поиск</button>
                         </form>
                         {% if user.is_authenticated %}
-                        <a class="btn btn-primary me-2 mb-2" href="{% url 'book-create' %}" role="button">Добавить книгу</a>
+                        <a class="btn btn-primary me-2 mb-2" href="{% url 'book-create' %}" role="button">Добавить
+                            книгу</a>
                         <a class="btn btn-primary me-2 mb-2" href="{% url 'profile' %}" role="button">Мои книги</a>
                         <a class="btn btn-primary me-2 mb-2" href="{% url 'logout' %}" role="button">Выйти</a>
                         {% else %}
