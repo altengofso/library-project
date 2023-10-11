@@ -32,7 +32,7 @@ class RegisterUser(generic.FormView):
     form_class = RegisterForm
 
     def get_success_url(self) -> str:
-        return reverse("profile")
+        return reverse("index")
 
     def dispatch(
         self, request: HttpRequest, *args: Any, **kwargs: Any
