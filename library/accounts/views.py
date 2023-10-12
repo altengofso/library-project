@@ -28,7 +28,7 @@ class AccountProfileView(LoginRequiredMixin, generic.ListView):
         return Book.objects.filter(added_by=self.request.user)
 
 
-class RegisterUser(generic.FormView):
+class RegisterUserView(generic.FormView):
     template_name = "register.html"
     form_class = RegisterForm
 
@@ -39,7 +39,7 @@ class RegisterUser(generic.FormView):
         self, request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse:
         if self.request.user.is_authenticated:
-            return HttpResponseRedirect(self.success_url)
+            return HttpResponseRedirect(self.get_success_url())
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form: Form) -> HttpResponse:
