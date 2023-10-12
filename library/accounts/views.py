@@ -1,7 +1,7 @@
 from typing import Any
 
 from catalog.models import Book
-from django.contrib.auth import authenticate, login, views
+from django.contrib.auth import authenticate, get_user_model, login, views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models.query import QuerySet
 from django.forms import Form
@@ -10,7 +10,8 @@ from django.urls import reverse
 from django.views import generic
 
 from .forms import RegisterForm
-from .models import User
+
+User = get_user_model()
 
 
 class AccountLoginView(views.LoginView):

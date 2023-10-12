@@ -1,12 +1,14 @@
 import uuid
 from datetime import datetime
 
-from accounts.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.postgres.indexes import GinIndex
 from django.db import IntegrityError, models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
+
+User = get_user_model()
 
 
 class UpperGinIndex(GinIndex):
