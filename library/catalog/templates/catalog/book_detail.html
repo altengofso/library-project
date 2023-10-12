@@ -21,7 +21,7 @@
         <p>Год публикации: {{ book.publication_year }} </p>
         <p>Описание: {{ book.summary }} </p>
         <p>
-            Рейтинг: {% if book.average_rating is not None %}{{ book.average_rating }}{% else %}Отсутствует{% endif %}
+            Рейтинг: {% if book.average_rating is not None %}{{ book.average_rating|floatformat }}{% else %}Отсутствует{% endif %}
         </p>
         {%if user.is_authenticated %}
         <div class="container">
