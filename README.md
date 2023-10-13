@@ -62,3 +62,4 @@ http://31.172.72.219/
      - LANGUAGE_CODE=ru-ru
     ```
   - запустить приложение ```docker-compose run -d --build```
+  - создать суперпользователя ```docker exec -it __container_id___ python manage.py createsuperuser```
