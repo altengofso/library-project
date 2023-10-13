@@ -14,7 +14,7 @@
     </div>
 </div>
 <div class="py-lg-4 container">
-    <form method="post" action="">
+    <form method="post" action="" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
         <div class="form-floating mb-2">
