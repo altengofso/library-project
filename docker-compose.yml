@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+    command: gunicorn library.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/home/app/web/library/static
+      - media_volume:/home/app/web/library/media
+    environment:
+      - DEBUG=0
+      - SECRET_KEY=
+      - DJANGO_ALLOWED_HOSTS=
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=postgres
+      - SQL_USER=postgres
+      - SQL_PASSWORD=postgres
+      - SQL_HOST=db
+      - SQL_PORT=5432
+      - DATABASE=postgres
+      - TZ=Europe/Moscow
+      - LANGUAGE_CODE=ru-ru
+    depends_on:
+      - db
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+  nginx:
+    build:
+      context: ./nginx
+    volumes:
+      - static_volume:/static
+      - media_volume:/media
+    ports:
+      - 80:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
