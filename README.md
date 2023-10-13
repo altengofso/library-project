@@ -39,7 +39,7 @@ http://31.172.72.219/
 ### Тестирование
 - Весь реализованный функционал покрыт юнит тестами
   - запуск тестов вне контейнера ```python manage.py test```
-  - запуск тестов в контейнере ```docker exec -it __container_id___ python manage.py test```
+  - запуск тестов в контейнере ```docker exec -it __container_id__ python manage.py test```
 
 ### Развертывание
 - Приложение подготовленно для развертывания с использованием docker-compose: Django + Postgres + Gunicorn + Nginx
@@ -62,4 +62,4 @@ http://31.172.72.219/
      - LANGUAGE_CODE=ru-ru
     ```
   - запустить приложение ```docker-compose run -d --build```
-  - создать суперпользователя ```docker exec -it __container_id___ python manage.py createsuperuser```
+  - создать суперпользователя ```docker exec -it __container_id__ python manage.py createsuperuser```
