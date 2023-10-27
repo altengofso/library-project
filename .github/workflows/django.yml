@@ -1,0 +1,21 @@
+name: Django Test
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build docker images
+      run: docker-compose build
+    - name: Run tests
+      env:
+        SECRET_KEY: secret
+        DJANGO_ALLOWED_HOSTS: 0.0.0.0
+      run: docker-compose run -e SECRET_KEY -e DJANGO_ALLOWED_HOSTS web python manage.py test
