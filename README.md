@@ -42,6 +42,7 @@ http://31.172.72.219/
 - Весь реализованный функционал покрыт юнит тестами
   - запуск тестов вне контейнера ```python manage.py test```
   - запуск тестов в контейнере ```docker exec -it __container_id__ python manage.py test```
+- Автоматический запуск тестов в Github Actions
 
 ### Развертывание
 - Приложение подготовленно для развертывания с использованием docker-compose: Django + Postgres + Gunicorn + Nginx
