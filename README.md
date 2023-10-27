@@ -1,6 +1,8 @@
 # library-project
 Веб-приложение на Django, которое реализует функциональность библиотеки книг.
 
+![Django Test Status](https://github.com/altengofso/library-project/actions/workflows/django.yml/badge.svg)
+
 ### Демо
 http://31.172.72.219/
 
