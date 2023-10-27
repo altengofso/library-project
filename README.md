@@ -1,7 +1,7 @@
 # library-project
-Веб-приложение на Django, которое реализует функциональность библиотеки книг.
+[![Django Test Status](https://github.com/altengofso/library-project/actions/workflows/django.yml/badge.svg)](https://github.com/altengofso/library-project/actions/workflows/django.yml)
 
-![Django Test Status](https://github.com/altengofso/library-project/actions/workflows/django.yml/badge.svg)
+Веб-приложение на Django, которое реализует функциональность библиотеки книг.
 
 ### Демо
 http://31.172.72.219/
